@@ -1,11 +1,9 @@
-  
 const express = require("express");
 const Booking = require("../models/Booking");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 
 // Create booking
-
 router.post("/", async (req, res) => {
   try {
     const { 
@@ -13,7 +11,6 @@ router.post("/", async (req, res) => {
       requests, carModel, carId, dailyRate, rentalDays, totalAmount 
     } = req.body;
 
-    // Convert string dates to Date objects
     const booking = new Booking({ 
       name, email, phone, 
       pickupDate: new Date(pickupDate), 
@@ -21,10 +18,9 @@ router.post("/", async (req, res) => {
       location, requests, carModel, carId, 
       dailyRate, rentalDays, totalAmount 
     });
-    
+
     await booking.save();
 
-    // Generate booking ID
     const bookingId = "CR" + Math.floor(100000 + Math.random() * 900000);
 
     res.json({ 
@@ -32,7 +28,7 @@ router.post("/", async (req, res) => {
       bookingId: bookingId,
       message: "Booking successful!" 
     });
-    
+
   } catch (err) {
     console.error("Booking error:", err);
     res.status(500).json({ 
@@ -43,3 +39,4 @@ router.post("/", async (req, res) => {
   }
 });
 
+module.exports = router;

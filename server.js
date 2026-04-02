@@ -6,32 +6,41 @@ const cors = require("cors");
 dotenv.config();
 const app = express();
 
-// Middleware
+// ✅ Middleware
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" }));
 
-// Routes
+// ✅ CORS Configuration (Production + Local)
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://carrental-blond-three.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+}));
+
+// ✅ Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/cars", require("./routes/cars"));
 app.use("/api/bookings", require("./routes/bookings"));
 
-// Connect MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+// ✅ MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// Default route (optional)
+// ✅ Default Route
 app.get("/", (req, res) => {
   res.send("🚗 Car Rental API is running...");
 });
 
-// Start server
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
-
- 
